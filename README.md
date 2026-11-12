@@ -9,18 +9,28 @@ This is not an official OBS Project, Microsoft, Xbox, or OpenXBL resource.
 - Shows Xbox online status and the currently active game
 - Shows achievement unlock alerts
 - Updates a browser source with the latest Xbox game clip
-- Automatically creates missing XboxStatus, XboxAchievement, and XboxClips sources
+- Automatically creates missing XboxStatus, XboxAchievement, XboxClips, and XboxGameArt sources
 - Adds missing sources to the selected scene
 - Automatically creates game-specific Move Action filters
 - Activates a matching Move Action filter when a game is detected
+- Pulls game artwork from Twitch
 - Uses a shared rolling limit of 120 OpenXBL requests per hour
 - Does not disable, reset, or overwrite existing Move Action filters
 
-## Get an OpenXBL API key
+## Requirements
+
+- OBS Studio with Python scripting enabled
+- Python 3.11 or 3.12
+- An OpenXBL account and Personal API Key: https://xbl.io
+- A Twitch Developer application
+- The Move plugin: https://github.com/AndreasLehrberg/obs-move-filter
+- A scene for the overlay sources and Move Action filters
+
+## OpenXBL setup
 
 This script uses OpenXBL, a third-party Xbox Live API service.
 
-1. Go to [https://xbl.io](https://xbl.io).
+1. Go to https://xbl.io.
 2. Sign in with the Microsoft account connected to your Xbox profile.
 3. Open the OpenXBL dashboard.
 4. Create a **Personal API Key**.
@@ -28,26 +38,57 @@ This script uses OpenXBL, a third-party Xbox Live API service.
 
 **Important:** Do not share your OpenXBL API key publicly. Every OpenXBL request must include it in the `X-Authorization` header. OpenXBL and Microsoft both apply rate limits, so avoid setting polling intervals too aggressively.
 
-## Requirements
+## Twitch Developer setup
 
-- OBS Studio with Python scripting enabled
-- Python 3.11 or 3.12
-- An OpenXBL account and Personal API Key: [https://xbl.io](https://xbl.io)
-- [Move](https://github.com/AndreasLehrberg/obs-move-filter) plugin
-- A scene for the overlay sources and Move Action filters
+The script uses Twitch artwork for the active Xbox game. It uses the Twitch Client Credentials flow, so you do **not** need to log in to Twitch or provide a user OAuth token.
+
+1. Go to the Twitch Developer Console: https://dev.twitch.tv/console
+2. Sign in with your Twitch account.
+3. Open **Applications**.
+4. Click **Register Your Application**.
+5. Enter a name, such as `OBS Xbox Overlay`.
+6. Enter these OAuth Redirect URLs:
+
+```text
+http://localhost
+```
+
+7. Select **Application Integration** as the category.
+8. Click **Create**.
+9. Open the application and copy the **Client ID**.
+10. Click **New Secret**, then copy the **Client Secret**.
+11. In OBS, open **Tools > Scripts > xbox.py**.
+12. Paste the Client ID into **Twitch Client ID**.
+13. Paste the Client Secret into **Twitch Client Secret**.
+14. Click **Reload Scripts**.
+
+The script automatically requests and refreshes a Twitch app access token. It uses that token to search Twitch for the active game and retrieve its box art.
+
+### Twitch artwork behavior
+
+The script tries the following in order:
+
+1. The exact Xbox game name
+2. A cleaned version of the game name
+3. Twitch Search Categories
+
+If Twitch cannot find artwork, the script leaves the current `XboxGameArt` browser source unchanged.
+
+Twitch box art is portrait-oriented cover art sourced from IGDB. It may not fill a 16:9 background perfectly. You can change the requested dimensions in the script settings, but the source image itself remains portrait-oriented.
 
 ## Setup
 
 1. Download `xbox.py` from the GitHub repository.
 2. In OBS, open **Tools > Scripts**.
 3. Click **+** and add `xbox.py`.
-4. Get an OpenXBL Personal API Key from [https://xbl.io/dashboard](https://xbl.io/dashboard), then paste it into the **OpenXBL API key** field.
-5. Set **Scene containing sources and filters** to the scene where you want the overlays and filters, for example: `gaming`.
-6. Optionally enter an XUID. Leave it blank to use the account associated with your OpenXBL API key.
-7. Let the script create `XboxStatus`, `XboxAchievement`, and `XboxClips`.
-8. Position and style the sources in OBS.
-9. Create a disabled Move Action filter on the selected scene named: `Xbox Move Template`.
-10. Enter `Xbox Move Template` in the Move Action template filter name setting.
+4. Get an OpenXBL Personal API Key from https://xbl.io/dashboard, then paste it into the **OpenXBL API key** field.
+5. Complete the Twitch Developer setup above and enter your Twitch Client ID and Client Secret.
+6. Set **Scene containing sources and filters** to the scene where you want the overlays and filters, for example: `gaming`.
+7. Optionally enter an XUID. Leave it blank to use the account associated with your OpenXBL API key.
+8. Let the script create `XboxStatus`, `XboxAchievement`, `XboxClips`, and `XboxGameArt`.
+9. Position and style the sources in OBS.
+10. Create a disabled Move Action filter on the selected scene named: `Xbox Move Template`.
+11. Enter `Xbox Move Template` in the Move Action template filter name setting.
 
 ## Sources created
 
@@ -56,13 +97,15 @@ This script uses OpenXBL, a third-party Xbox Live API service.
 | `XboxStatus` | Text (GDI+) | Xbox status and current game |
 | `XboxAchievement` | Text (GDI+) | Temporary achievement alert |
 | `XboxClips` | Browser | Latest Xbox game clip |
+| `XboxGameArt` | Browser | Twitch artwork for the active game |
 
 Example XboxStatus output:
 
 ```text
 XBOX: Online
-NOW PLAYING: ARK: Survival Ascended
-Currently playing ARK: Survival Ascended
+DEVICE: Xbox Series X|S
+NOW PLAYING: Battlefield™ 6
+Main Menu
 ```
 
 ## Move Action filters
@@ -82,7 +125,7 @@ xbox <game name>
 Examples:
 
 ```text
-xbox ark: survival ascended
+xbox ark
 xbox battlefield 6
 xbox call of duty: black ops 6
 xbox forza horizon 5
