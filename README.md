@@ -1,6 +1,6 @@
 # Xbox Live Presence & Clip Overlay Script
 
-A third-party Python script for OBS Studio. It displays Xbox Live presence, achievement unlocks, and the latest Xbox game clip. It can also automatically create and activate [Move Action](https://github.com/AndreasLehrberg/obs-move-filter) scene filters when it detects the active Xbox game.
+A third-party Python script for OBS Studio. It displays Xbox Live presence, achievement unlocks, and the latest Xbox game clip. It can also automatically create and activate Move Action scene filters when it detects the active Xbox game.
 
 This is not an official OBS Project, Microsoft, Xbox, or OpenXBL resource.
 
@@ -18,7 +18,7 @@ This is not an official OBS Project, Microsoft, Xbox, or OpenXBL resource.
 
 ## Get an OpenXBL API key
 
-This script uses [OpenXBL](https://xbl.io), a third-party Xbox Live API service.
+This script uses OpenXBL, a third-party Xbox Live API service.
 
 1. Go to [https://xbl.io](https://xbl.io).
 2. Sign in with the Microsoft account connected to your Xbox profile.
