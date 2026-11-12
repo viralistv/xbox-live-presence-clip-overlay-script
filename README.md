@@ -33,7 +33,7 @@ This script uses OpenXBL, a third-party Xbox Live API service.
 - OBS Studio with Python scripting enabled
 - Python 3.11 or 3.12
 - An OpenXBL account and Personal API Key: [https://xbl.io](https://xbl.io)
-- [Move Action](https://github.com/AndreasLehrberg/obs-move-filter) plugin
+- [Move](https://github.com/AndreasLehrberg/obs-move-filter) plugin
 - A scene for the overlay sources and Move Action filters
 
 ## Setup
