@@ -23,7 +23,7 @@ This is not an official OBS Project, Microsoft, Xbox, or OpenXBL resource.
 - Python 3.11 or 3.12
 - An OpenXBL account and Personal API Key: https://xbl.io
 - A Twitch Developer application
-- The Move plugin: https://github.com/AndreasLehrberg/obs-move-filter
+- The Move plugin: https://obsproject.com/forum/resources/move.913/
 - A scene for the overlay sources and Move Action filters
 
 ## OpenXBL setup
